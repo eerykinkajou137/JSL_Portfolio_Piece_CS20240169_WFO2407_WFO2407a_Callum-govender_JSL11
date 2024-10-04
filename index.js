@@ -206,7 +206,7 @@ function setupEventListeners() {
   });
 
   // Show sidebar event listener
-  elements.hideSideBarButton.addEventListener('click', () => toggleSidebar(false));
+  elements.hideSideBarButton.addEventListener('click', () => toggleSidebar(false) );
   elements.showSideBarButton.addEventListener('click', () => toggleSidebar(true));
 
   // Theme switch event listener
@@ -268,9 +268,23 @@ function addTask(event) {
 
 function toggleSidebar(show) {
   const sideBar = document.getElementById('side-bar-div');
+  const showButton = elements.showSideBarButton; // Reference to the show button
+  const hideButton = elements.hideSideBarButton; // Reference to the hide button
+
   sideBar.style.display = show ? 'block' : 'none'; // Show or hide sidebar
   localStorage.setItem('showSideBar', show); // Save preference to local storage
+
+  // Show/hide buttons based on sidebar visibility
+  if (show) {
+    showButton.style.display = 'none'; // Hide show button when sidebar is visible
+    hideButton.style.display = 'block'; // Show hide button when sidebar is visible
+  } else {
+    showButton.style.display = 'block'; // Show show button when sidebar is hidden
+    hideButton.style.display = 'none'; // Hide hide button when sidebar is hidden
+  }
 }
+
+
 
 
 function toggleTheme() {
