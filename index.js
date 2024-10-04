@@ -1,5 +1,5 @@
 // TASK: import helper functions from utils
-import * as taskFunctions from './utils/taskFunction.js';
+import * as taskFunctions from './utils/taskFunctions.js';
 // TASK: import initialData
 import {initialData} from '/initialData.js';
 
@@ -233,67 +233,84 @@ function setupEventListeners() {
 function toggleModal(show, modal = elements.modalWindow) {
   modal.style.display = show ? 'block':'none'; 
 }
-
 /*************************************************************************************************************************************************
  * COMPLETE FUNCTION CODE
  * **********************************************************************************************************************************************/
 
+
 function addTask(event) {
   event.preventDefault(); 
 
-  //Assign user input to the task object
-    const task = {
-      
-    };
-    const newTask = createNewTask(task);
-    if (newTask) {
-      addTaskToUI(newTask);
-      toggleModal(false);
-      elements.filterDiv.style.display = 'none'; // Also hide the filter overlay
-      event.target.reset();
-      refreshTasksUI();
-    }
+  // Assign user input to the task object
+  const task = {
+    title: event.target['title-input'].value, // Assuming input name is 'title-input'
+    description: event.target['desc-input'].value, // Assuming input name is 'desc-input'
+    status: event.target['select-status'].value, // Assuming select name is 'select-status'
+    board: activeBoard, // Use active board from the context
+    id: Date.now() // Generate a unique ID using timestamp
+  };
+
+  const newTask = createNewTask(task);
+  if (newTask) {
+    addTaskToUI(newTask);
+    toggleModal(false);
+    elements.filterDiv.style.display = 'none'; // Also hide the filter overlay
+    event.target.reset(); // Reset the form inputs
+    refreshTasksUI(); // Refresh the UI to show the new task
+  }
 }
 
 
 function toggleSidebar(show) {
- 
+  const sideBar = document.getElementById('side-bar-div');
+  sideBar.style.display = show ? 'block' : 'none'; // Show or hide sidebar
+  localStorage.setItem('showSideBar', show); // Save preference to local storage
 }
+
 
 function toggleTheme() {
- 
+  const isLightTheme = document.body.classList.toggle('light-theme');
+  localStorage.setItem('light-theme', isLightTheme ? 'enabled' : 'disabled'); // Save theme preference
 }
-
 
 
 function openEditTaskModal(task) {
   // Set task details in modal inputs
-  
+  document.getElementById('edit-task-title-input').value = task.title;
+  document.getElementById('edit-task-desc-input').value = task.description;
+  document.getElementById('edit-select-status').value = task.status;
 
   // Get button elements from the task modal
-
+  const saveChangesBtn = document.getElementById('save-task-changes-btn');
+  const deleteTaskBtn = document.getElementById('delete-task-btn');
 
   // Call saveTaskChanges upon click of Save Changes button
- 
+  saveChangesBtn.onclick = () => saveTaskChanges(task.id);
 
   // Delete task using a helper function and close the task modal
-
+  deleteTaskBtn.onclick = () => {
+    deleteTask(task.id);
+    toggleModal(false);
+  };
 
   toggleModal(true, elements.editTaskModal); // Show the edit task modal
 }
 
+
 function saveTaskChanges(taskId) {
   // Get new user inputs
+  const updatedTask = {
+    title: document.getElementById('edit-task-title-input').value,
+    description: document.getElementById('edit-task-desc-input').value,
+    status: document.getElementById('edit-select-status').value,
+    id: taskId
+  };
+
+  // Update task using a helper function
+  updateTask(updatedTask);
   
-
-  // Create an object with the updated task details
-
-
-  // Update task using a hlper functoin
- 
-
   // Close the modal and refresh the UI to reflect the changes
-
+  toggleModal(false, elements.editTaskModal);
   refreshTasksUI();
 }
 
