@@ -315,10 +315,13 @@ function saveTaskChanges(taskId) {
     status: document.getElementById('edit-select-status').value,
     id: taskId
   };
+  let id = taskId;
+
 
   // Update task using a helper function
-  patchTask(updatedTask);
-  putTask(id, updatedTask)
+  patchTask(id , updatedTask);
+  putTask(id, updatedTasks);
+  
   
   // Close the modal and refresh the UI to reflect the changes
   toggleEditModal(false, elements.editTaskModal);
