@@ -65,15 +65,24 @@ let activeBoard = ""
 // TASK: FIX BUGS
 function fetchAndDisplayBoardsAndTasks() {
   const tasks = getTasks();
+  if (!tasks || !Array.isArray(tasks)) {
+    console.error("No tasks found or tasks is not an array.");
+    return;
+}
+
   const boards = [...new Set(tasks.map(task => task.board).filter(Boolean))];
   displayBoards(boards);
   if (boards.length > 0) {
     const localStorageBoard = JSON.parse(localStorage.getItem("activeBoard"))
-    activeBoard = localStorageBoard ? localStorageBoard ;  boards[0]; 
+    activeBoard = localStorageBoard ? localStorageBoard: boards[0]; 
     elements.headerBoardName.textContent = activeBoard
     styleActiveBoard(activeBoard)
     refreshTasksUI();
   }
+  else {
+    elements.headerBoardName.textContent = "No Boards Available";
+    // Optionally clear task display UI here
+}
 }
 
 // Creates different boards in the DOM
@@ -81,17 +90,20 @@ function fetchAndDisplayBoardsAndTasks() {
 function displayBoards(boards) {
   const boardsContainer = document.getElementById("boards-nav-links-div");
   boardsContainer.innerHTML = ''; // Clears the container
+
   boards.forEach(board => {
     const boardElement = document.createElement("button");
     boardElement.textContent = board;
     boardElement.classList.add("board-btn");
-    boardElement.click()  { 
+
+    //Attaching click event listener
+    boardElement.addEventListener("click", () =>  { 
       elements.headerBoardName.textContent = board;
       filterAndDisplayTasksByBoard(board);
       activeBoard = board //assigns active board
       localStorage.setItem("activeBoard", JSON.stringify(activeBoard))
       styleActiveBoard(activeBoard)
-    };
+    });
     boardsContainer.appendChild(boardElement);
   });
 
@@ -101,7 +113,7 @@ function displayBoards(boards) {
 // TASK: Fix Bugs
 function filterAndDisplayTasksByBoard(boardName) {
   const tasks = getTasks(); // Fetch tasks from a simulated local storage function
-  const filteredTasks = tasks.filter(task => task.board = boardName);
+  const filteredTasks = tasks.filter(task => task.board === boardName);// '===' for comparison
 
   // Ensure the column titles are set outside of this function or correctly initialized before this function runs
 
@@ -116,14 +128,15 @@ function filterAndDisplayTasksByBoard(boardName) {
     const tasksContainer = document.createElement("div");
     column.appendChild(tasksContainer);
 
-    filteredTasks.filter(task => task.status = status).forEach(task => { 
+    filteredTasks.filter(task => task.status === status)
+    .forEach(task => { 
       const taskElement = document.createElement("div");
       taskElement.classList.add("task-div");
       taskElement.textContent = task.title;
       taskElement.setAttribute('data-task-id', task.id);
 
       // Listen for a click event on each task and open a modal
-      taskElement.click() => { 
+      taskElement.addEventListener("click", () => { 
         openEditTaskModal(task);
       });
 
