@@ -190,12 +190,12 @@ function addTaskToUI(task) {
 function setupEventListeners() {
   // Cancel editing task event listener
   const cancelEditBtn = document.getElementById('cancel-edit-btn');
-  cancelEditBtn.addEventListener("click", () => toggleEditModal(false, elements.editTaskModal));
+  cancelEditBtn.addEventListener("click", () => toggleModal(false, elements.editTaskModalWindow));
 
   // Cancel adding new task event listener
   const cancelAddTaskBtn = document.getElementById('cancel-add-task-btn');
   cancelAddTaskBtn.addEventListener('click', () => {
-    toggleAddModal(false);
+    toggleModal(false, elements.newTaskModalWindow);
     elements.filterDiv.style.display = 'none'; // Also hide the filter overlay
   });
 
@@ -214,7 +214,7 @@ function setupEventListeners() {
 
   // Show Add New Task Modal event listener
   elements.createTaskButton.addEventListener('click', () => {
-    toggleAddModal(true);
+    toggleModal(true, elements.newTaskModalWindow);
     elements.filterDiv.style.display = 'block'; // Also show the filter overlay
   });
 
@@ -225,19 +225,16 @@ function setupEventListeners() {
   });
 
   elements.addNewTaskButton.addEventListener('click', () => 
-    openNewTaskModal()
+    toggleModal(true, elements.newTaskModalWindow)
   );
 }
 
 // Toggles tasks modal
 // Task: Fix bugs
-function toggleEditModal(show, modal = elements.editTaskModalWindow) {
+function toggleModal(show, modal) {
   modal.style.display = show ? 'block':'none'; 
 }
 
-function toggleAddModal(show, modal = elements.newTaskModalWindow) {
-  modal.style.display = show ? 'block':'none'; 
-}
 /*************************************************************************************************************************************************
  * COMPLETE FUNCTION CODE
  * **********************************************************************************************************************************************/
@@ -258,7 +255,7 @@ function addTask(event) {
   const newTask = createNewTask(task);
   if (newTask) {
     addTaskToUI(newTask);
-    toggleAddModal(false);
+    toggleModal(false, elements.newTaskModalWindow);
     elements.filterDiv.style.display = 'none'; // Also hide the filter overlay
     event.target.reset(); // Reset the form inputs
     refreshTasksUI(); // Refresh the UI to show the new task
@@ -299,25 +296,25 @@ function openEditTaskModal(task) {
   document.getElementById('edit-task-desc-input').value = task.description;
   document.getElementById('edit-select-status').value = task.status;
 
+  toggleModal(true, elements.editTaskModalWindow); // Show the edit task modal
+
   // Get button elements from the task modal
   const saveChangesBtn = document.getElementById('save-task-changes-btn');
   const deleteTaskBtn = document.getElementById('delete-task-btn');
 
   // Call saveTaskChanges upon click of Save Changes button
-  saveChangesBtn.addEventListener('click', () => saveTaskChanges(task.id));
+  saveChangesBtn.onclick = () => {
+      saveTaskChanges(task.id);
+      toggleModal(false, elements.editTaskModalWindow); // Hide modal
+      refreshTasksUI(); // Refresh UI
+  };
 
   // Delete task using a helper function and close the task modal
-  deleteTaskBtn.addEventListener('click', () => 
-    deleteTask(task.id),
-    toggleEditModal(false, elements.editTaskModalWindow),
-    
-  );
-
-  toggleEditModal(true, elements.editTaskModalWindow); // Show the edit task modal
-}
-
-function openNewTaskModal(){
-   elements.newTaskModalWindow.style.display = 'block';
+  deleteTaskBtn.onclick = () => {
+      deleteTask(task.id);
+      toggleModal(false, elements.editTaskModalWindow); // Hide modal
+      refreshTasksUI(); // Refresh UI
+  };
 }
 
 
@@ -334,11 +331,11 @@ function saveTaskChanges(taskId) {
 
   // Update task using a helper function
   patchTask(id , updatedTask);
-  putTask(id, updatedTasks);
+  putTask(id, updatedTask);
   
   
   // Close the modal and refresh the UI to reflect the changes
-  toggleEditModal(false, elements.editTaskModal);
+  toggleModal(false, elements.editTaskModal);
   refreshTasksUI;
 }
 
