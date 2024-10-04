@@ -19,8 +19,45 @@ function initializeData() {
 
 // TASK: Get elements from the DOM
 const elements = {
+  sideBar: document.getElementById('side-bar-div'),
+  logo: document.getElementById('logo'),
+  boardsNavLinks: document.getElementById('boards-nav-links-div'),
+  themeToggleSwitch: document.getElementById('switch'),
+  hideSideBarButton: document.getElementById('hide-side-bar-btn'),
+  showSideBarButton: document.getElementById('show-side-bar-btn'),
+  headerBoardName: document.getElementById('header-board-name'),
+  addNewTaskButton: document.getElementById('add-new-task-btn'),
+  editBoardButton: document.getElementById('edit-board-btn'),
+  editBoardDiv: document.getElementById('editBoardDiv'),
+  deleteBoardButton: document.getElementById('deleteBoardBtn'),
+  
+  // Columns
+  todoColumn: document.querySelector('[data-status="todo"] .tasks-container'),
+  doingColumn: document.querySelector('[data-status="doing"] .tasks-container'),
+  doneColumn: document.querySelector('[data-status="done"] .tasks-container'),
+  
+  // New Task Modal
+  newTaskModalWindow: document.getElementById('new-task-modal-window'),
+  titleInput: document.getElementById('title-input'),
+  descriptionInput: document.getElementById('desc-input'),
+  selectStatus: document.getElementById('select-status'),
+  createTaskButton: document.getElementById('create-task-btn'),
+  cancelAddTaskButton: document.getElementById('cancel-add-task-btn'),
+
+  // Edit Task Modal
+  editTaskModalWindow: document.querySelector('.edit-task-modal-window'),
+  editTaskTitleInput: document.getElementById('edit-task-title-input'),
+  editTaskDescInput: document.getElementById('edit-task-desc-input'),
+  editSelectStatus: document.getElementById('edit-select-status'),
+  saveTaskChangesButton: document.getElementById('save-task-changes-btn'),
+  cancelEditButton: document.getElementById('cancel-edit-btn'),
+  deleteTaskButton: document.getElementById('delete-task-btn'),
+
+  // Filters
+  filterDiv: document.getElementById('filterDiv'),
 
 }
+export default elements;
 
 let activeBoard = ""
 
