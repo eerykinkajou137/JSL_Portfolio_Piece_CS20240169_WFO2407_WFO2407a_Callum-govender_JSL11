@@ -1,7 +1,7 @@
 // TASK: import helper functions from utils
-import * as taskFunctions from './utils/taskFunctions.js';
+import {getTasks, createNewTask, patchTask, putTask, deleteTask} from './utils/taskFunctions.js';
 // TASK: import initialData
-import {initialData} from '/initialData.js';
+import {initialData} from './initialData.js';
 
 /*************************************************************************************************************************************************
  * FIX BUGS!!!
@@ -19,7 +19,6 @@ function initializeData() {
 
 // TASK: Get elements from the DOM
 const elements = {
-  sideBar: document.getElementById('side-bar-div'),
   logo: document.getElementById('logo'),
   boardsNavLinks: document.getElementById('boards-nav-links-div'),
   themeToggleSwitch: document.getElementById('switch'),
@@ -42,20 +41,18 @@ const elements = {
   descriptionInput: document.getElementById('desc-input'),
   selectStatus: document.getElementById('select-status'),
   createTaskButton: document.getElementById('create-task-btn'),
-  cancelAddTaskButton: document.getElementById('cancel-add-task-btn'),
 
   // Edit Task Modal
   editTaskModalWindow: document.querySelector('.edit-task-modal-window'),
   editTaskTitleInput: document.getElementById('edit-task-title-input'),
   editTaskDescInput: document.getElementById('edit-task-desc-input'),
   editSelectStatus: document.getElementById('edit-select-status'),
-  saveTaskChangesButton: document.getElementById('save-task-changes-btn'),
   cancelEditButton: document.getElementById('cancel-edit-btn'),
-  deleteTaskButton: document.getElementById('delete-task-btn'),
+ 
 
   // Filters
   filterDiv: document.getElementById('filterDiv'),
-
+  columnDivs: document.querySelectorAll('.column-div'),  // Select all divs with class "column-div"
 }
 export default elements;
 
@@ -193,12 +190,12 @@ function addTaskToUI(task) {
 function setupEventListeners() {
   // Cancel editing task event listener
   const cancelEditBtn = document.getElementById('cancel-edit-btn');
-  cancelEditBtn.addEventListener("click", () => toggleModal(false, elements.editTaskModal));
+  cancelEditBtn.addEventListener("click", () => toggleEditModal(false, elements.editTaskModal));
 
   // Cancel adding new task event listener
   const cancelAddTaskBtn = document.getElementById('cancel-add-task-btn');
   cancelAddTaskBtn.addEventListener('click', () => {
-    toggleModal(false);
+    toggleAddModal(false);
     elements.filterDiv.style.display = 'none'; // Also hide the filter overlay
   });
 
@@ -209,28 +206,36 @@ function setupEventListeners() {
   });
 
   // Show sidebar event listener
-  elements.hideSideBarBtn.addEventListener('click', () => toggleSidebar(false));
-  elements.showSideBarBtn.addEventListener('click', () => toggleSidebar(true));
+  elements.hideSideBarButton.addEventListener('click', () => toggleSidebar(false));
+  elements.showSideBarButton.addEventListener('click', () => toggleSidebar(true));
 
   // Theme switch event listener
-  elements.themeSwitch.addEventListener('change', toggleTheme);
+  elements.themeToggleSwitch.addEventListener('change', toggleTheme);
 
   // Show Add New Task Modal event listener
-  elements.createNewTaskBtn.addEventListener('click', () => {
-    toggleModal(true);
+  elements.createTaskButton.addEventListener('click', () => {
+    toggleAddModal(true);
     elements.filterDiv.style.display = 'block'; // Also show the filter overlay
   });
 
   // Add new task form submission event listener
-  elements.modalWindow.addEventListener('submit',  (event) => {
+  elements.newTaskModalWindow.addEventListener('submit',  (event) => {
     event.preventDefault();// stops defualt submission
     addTask(event)
   });
+
+  elements.addNewTaskButton.addEventListener('click', () => 
+    openNewTaskModal()
+  );
 }
 
 // Toggles tasks modal
 // Task: Fix bugs
-function toggleModal(show, modal = elements.modalWindow) {
+function toggleEditModal(show, modal = elements.editTaskModalWindow) {
+  modal.style.display = show ? 'block':'none'; 
+}
+
+function toggleAddModal(show, modal = elements.newTaskModalWindow) {
   modal.style.display = show ? 'block':'none'; 
 }
 /*************************************************************************************************************************************************
@@ -253,7 +258,7 @@ function addTask(event) {
   const newTask = createNewTask(task);
   if (newTask) {
     addTaskToUI(newTask);
-    toggleModal(false);
+    toggleAddModal(false);
     elements.filterDiv.style.display = 'none'; // Also hide the filter overlay
     event.target.reset(); // Reset the form inputs
     refreshTasksUI(); // Refresh the UI to show the new task
@@ -285,15 +290,20 @@ function openEditTaskModal(task) {
   const deleteTaskBtn = document.getElementById('delete-task-btn');
 
   // Call saveTaskChanges upon click of Save Changes button
-  saveChangesBtn.onclick = () => saveTaskChanges(task.id);
+  saveChangesBtn.addEventListener('click', () => saveTaskChanges(task.id));
 
   // Delete task using a helper function and close the task modal
-  deleteTaskBtn.onclick = () => {
-    deleteTask(task.id);
-    toggleModal(false);
-  };
+  deleteTaskBtn.addEventListener('click', () => 
+    deleteTask(task.id),
+    toggleEditModal(false, elements.editTaskModalWindow),
+    
+  );
 
-  toggleModal(true, elements.editTaskModal); // Show the edit task modal
+  toggleEditModal(true, elements.editTaskModalWindow); // Show the edit task modal
+}
+
+function openNewTaskModal(){
+   elements.newTaskModalWindow.style.display = 'block';
 }
 
 
@@ -307,17 +317,20 @@ function saveTaskChanges(taskId) {
   };
 
   // Update task using a helper function
-  updateTask(updatedTask);
+  patchTask(updatedTask);
+  putTask(id, updatedTask)
   
   // Close the modal and refresh the UI to reflect the changes
-  toggleModal(false, elements.editTaskModal);
-  refreshTasksUI();
+  toggleEditModal(false, elements.editTaskModal);
+  refreshTasksUI;
 }
+
 
 /*************************************************************************************************************************************************/
 
 document.addEventListener('DOMContentLoaded', function() {
   init(); // init is called after the DOM is fully loaded
+  initializeData()
 });
 
 function init() {
@@ -328,3 +341,5 @@ function init() {
   document.body.classList.toggle('light-theme', isLightTheme);
   fetchAndDisplayBoardsAndTasks(); // Initial display of boards and tasks
 }
+
+
